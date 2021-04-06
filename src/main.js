@@ -4,6 +4,11 @@ import App from './App.vue'
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
 
+// Vue Money 
+import money from "v-money"
+
+Vue.use(money, {precision: 4})
+
 // Filters
 Vue.filter("upperFirstChar", function(value) {
   if (value.length <= 0) {
@@ -14,7 +19,8 @@ Vue.filter("upperFirstChar", function(value) {
 })
 
 Vue.filter("toCurrency", function(value) {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  let stringNumber = value.toString()
+  return stringNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 })
 
 Vue.config.productionTip = false

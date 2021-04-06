@@ -12,24 +12,20 @@
     <input class="form__input" type="email" v-model.trim="$v.email.$model"/>
     <br>
     <label class="form__label" >Amount: </label>
-    <input class="form__input" placeholder="$0.00" v-model.trim="$v.amount.$model" type="number" step=".01"/>
+    <money class="form__input"  v-model.trim="$v.amount.$model" v-bind="money"></money>
   </div>
   <div class="error" v-if="!$v.firstName.required">First Name is required</div>
   <div class="error" v-if="!$v.firstName.maxLength">First Name must have at least {{$v.firstName.$params.maxLength.max}} letters.</div>
   <div class="error" v-if="!$v.lastName.required">Last Name is required</div>
   <div class="error" v-if="!$v.lastName.maxLength">Last Name must have at least {{$v.lastName.$params.maxLength.max}} letters.</div>
   <div class="error" v-if="!$v.email.email">Email must be in valid format.</div>
-  <div class="error" v-if="!$v.amount.required">Amount is required</div>
-  <div class="error" v-if="!$v.amount.minValue">Amount must be a number greater than {{$v.amount.$params.minValue.min}}</div>
-  <div class="error" v-if="!$v.amount.decimal">Please include the decimals</div>
-  <div class="error" v-if="!$v.amount.decimal">Please include the decimals</div>
-
+  <div class="error" v-if="amount === 0">Amount is required</div>
   <button class="button" type="submit" :disabled="submitStatus === 'PENDING'">Review Payment Details</button>
   <p class="typo__p" v-if="submitStatus === 'OK'">Thanks for your submission!</p>
   <p class="typo__p" v-if="submitStatus === 'ERROR'">Please fill the form correctly.</p>
   <p class="typo__p" v-if="submitStatus === 'PENDING'">Sending...</p>
 </form>
-<ReviewModal 
+<ReviewPage 
   v-show="modalOn"
   @close="closeModal"
   :firstName="firstName"
@@ -37,33 +33,36 @@
   :email="email"
   :amount="amount"
 />
-<SuccessModal
-        v-show="successModal"
-        @close="closeSuccessModal"
-    />
 </div>
 </template>
 
 <script>
-import { required, maxLength, email, minValue, decimal } from 'vuelidate/lib/validators'
-import ReviewModal from './Modal'
-import SuccessModal from './SuccessModal'
+import { required, maxLength, email, minValue } from 'vuelidate/lib/validators'
+import ReviewPage from './ReviewPage'
+import {Money} from 'v-money';
 
 export default {
   name:"Form",
   components: {
-    ReviewModal,
-    SuccessModal
+    ReviewPage,
+    Money
   },
   data() {
     return {
-      successModal: false,
       modalOn: false,
       submitStatus: null,
       firstName: '',
       lastName: '',
       email: '',
-      amount: '',
+      amount: 0,
+      money: {
+          decimal: '.',
+          thousands: ',',
+          prefix: '$',
+          suffix: '',
+          precision: 2,
+          masked: false
+        }
     }
   },
   validations: {
@@ -80,8 +79,7 @@ export default {
     },
     amount: {
         required,
-        decimal,
-        minValue: minValue(.00)
+        minValue: minValue(0)
     }
   },
   methods: {
@@ -96,10 +94,7 @@ export default {
           
         }, 500)
         setTimeout(() => {
-          this.propsData.firstName = this.firstName
-          this.propsData.lastName = this.lastName
-          this.propsData.email = this.email
-          this.propsData.amount = this.amount  
+          
           this.modalOn = true
         }, 750)
       }
@@ -118,4 +113,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  button {
+    background: green;
+    border-radius: 4px;
+    color: white;
+  }
+</style>
 

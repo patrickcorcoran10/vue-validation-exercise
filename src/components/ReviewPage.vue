@@ -4,20 +4,21 @@
     <div class="modal">
       <header class="modal-header">
         <slot name="header">
+            <!-- Here is some filters which can be referenced in main.js -->
             Thank you {{firstName | upperFirstChar}} {{lastName | upperFirstChar}}
         </slot>
       </header>
 
       <section class="modal-body">
         <slot name="body">
-          <p>Please review your purchase of ${{amount | toCurrency}} dollars.</p>
+            <!-- Here is some filters which can be referenced in main.js -->
+          <p>Please review your purchase of ${{amount | toCurrency}}</p>
+          <!-- Here's the mailto: trick. -->
           <a :href="'mailto:' + email" >{{email}}</a>
         </slot>
        </section>
-
       <footer class="modal-footer">
         <slot name="footer">
-          
         </slot>
         <button
           @click="submitPayment"
@@ -28,45 +29,40 @@
         <button
           type="button"
           class="btn-green"
-          @click="close"
+          @click="back"
         >
           Back
         </button>
       </footer>
     </div>
-    
   </div>
-  
+  <SuccessModal v-show="modalOn"/>
     </div>
 </template>
 
 <script>
+import SuccessModal from './SuccessModal'
   export default {
-    name: 'Modal',
+    name: 'ReviewPage',
     components: {
+      SuccessModal
     },
-    props: ["firstName", "lastName", "email", "amount"], 
-    data: function() {
-        return {
-        mailtoEmail: "mailto:emailtoemailto",
-        
-        }
-    },  
+    data: () => {
+      return {
+        modalOn: false
+      }
+    },
+    props: ["firstName", "lastName", "email", "amount"],  
     methods: {
-      close() {
+      back() {
         this.$emit('close');
       },
       submitPayment() {
           console.log("success")
-          
-          this.successModal = true
-
+          this.modalOn = true
       },
-      closeModal() {
-      this.successModal = false;
-    }
-    },
     
+    },
   };
 </script>
 
